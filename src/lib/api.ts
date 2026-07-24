@@ -1,9 +1,13 @@
 import { createClient } from '@supabase/supabase-js'
 import { DiagnosisInput, DiagnosisResponse } from '@/types'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL ?? ''
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
+export const isSupabaseConfigured = supabaseUrl.length > 0 && supabaseAnonKey.length > 0
+export const supabaseConfigError =
+  !isSupabaseConfigured
+    ? 'Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your deployment environment.'
+    : undefined
 
 export const supabase = isSupabaseConfigured ? createClient(supabaseUrl, supabaseAnonKey) : null
 
@@ -11,8 +15,7 @@ export async function submitDiagnosis(input: DiagnosisInput): Promise<DiagnosisR
   if (!isSupabaseConfigured || !supabase) {
     return {
       success: false,
-      error:
-        'Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your deployment environment.',
+      error: supabaseConfigError,
     }
   }
   try {

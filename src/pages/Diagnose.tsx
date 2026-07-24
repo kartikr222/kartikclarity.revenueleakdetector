@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { submitDiagnosis } from '@/lib/api'
+import { submitDiagnosis, isSupabaseConfigured } from '@/lib/api'
 import { useDiagnosis } from '@/context/DiagnosisContext'
 import { DiagnosisInput } from '@/types'
 import { Loader2 } from 'lucide-react'
@@ -46,6 +46,11 @@ export default function Diagnose() {
     }
 
     try {
+      if (!isSupabaseConfigured) {
+        setError('Diagnostic service is not configured. Please update the deployment environment.')
+        return
+      }
+
       const response = await submitDiagnosis(formData)
       if (response.success && response.data) {
         setResult(response.data)
@@ -224,6 +229,16 @@ export default function Diagnose() {
                 </Select>
               </div>
 
+              {!isSupabaseConfigured && (
+                <div className="mb-6 rounded-2xl border border-yellow-300/40 bg-yellow-300/10 p-4 text-yellow-100">
+                  <p className="font-semibold">Diagnostic service is temporarily unavailable.</p>
+                  <p className="text-sm text-yellow-100/80">
+                    The deployment is missing Supabase configuration. Please set <code>VITE_SUPABASE_URL</code> and{' '}
+                    <code>VITE_SUPABASE_ANON_KEY</code> in production, then reload the page.
+                  </p>
+                </div>
+              )}
+
               {error && (
                 <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg text-sm">
                   {error}
@@ -232,7 +247,7 @@ export default function Diagnose() {
 
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !isSupabaseConfigured}
                 className="w-full bg-cream text-navy hover:bg-cream/90 text-lg py-6 font-semibold"
               >
                 {loading ? (
