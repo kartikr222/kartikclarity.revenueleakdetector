@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Kartik Clarity logo">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#F6E7C7" />
+      <stop offset="1" stop-color="#E8D5B5" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="40" fill="#0F1724" />
+  <g transform="translate(30,30) scale(0.7)">
+    <path d="M10 64 L50 64 L90 120 L130 50 L170 24" stroke="url(#g)" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    <circle cx="90" cy="120" r="8" fill="url(#g)" opacity="0.95" />
+    <circle cx="10" cy="64" r="8" fill="url(#g)" />
+    <path d="M170 24 L160 34 M170 24 L180 35" stroke="url(#g)" stroke-width="8" stroke-linecap="round" />
+  </g>
+</svg>

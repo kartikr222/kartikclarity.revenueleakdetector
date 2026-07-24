@@ -38,7 +38,21 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-size: 16px;
   }
+}
+
+/* UI polish */
+.container {
+  max-width: 1200px;
+}
+
+.btn-gradient {
+  background: linear-gradient(90deg,#F6E7C7 0%, #E8D5B5 100%);
+  color: #0F1724;
+  box-shadow: 0 6px 18px rgba(8,10,20,0.45);
 }
 
 ::-webkit-scrollbar {
