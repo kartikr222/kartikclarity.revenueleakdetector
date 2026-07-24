@@ -3,14 +3,18 @@ import { DiagnosisInput, DiagnosisResponse } from '@/types'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables')
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = isSupabaseConfigured ? createClient(supabaseUrl, supabaseAnonKey) : null
 
 export async function submitDiagnosis(input: DiagnosisInput): Promise<DiagnosisResponse> {
+  if (!isSupabaseConfigured || !supabase) {
+    return {
+      success: false,
+      error:
+        'Supabase is not configured. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your deployment environment.',
+    }
+  }
   try {
     const { data, error } = await supabase.functions.invoke('diagnose', {
       body: input,
