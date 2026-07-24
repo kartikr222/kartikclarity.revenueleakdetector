@@ -1,15 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Kartik Clarity logo">
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Kartik Clarity logo">
   <defs>
-    <linearGradient id="g" x1="0" x2="1">
-      <stop offset="0" stop-color="#F6E7C7" />
-      <stop offset="1" stop-color="#E8D5B5" />
+    <linearGradient id="logo-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6E7C7" />
+      <stop offset="100%" stop-color="#E8D5B5" />
     </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
   </defs>
-  <rect width="200" height="200" rx="40" fill="#0F1724" />
-  <g transform="translate(30,30) scale(0.7)">
-    <path d="M10 64 L50 64 L90 120 L130 50 L170 24" stroke="url(#g)" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-    <circle cx="90" cy="120" r="8" fill="url(#g)" opacity="0.95" />
-    <circle cx="10" cy="64" r="8" fill="url(#g)" />
-    <path d="M170 24 L160 34 M170 24 L180 35" stroke="url(#g)" stroke-width="8" stroke-linecap="round" />
+  <rect width="200" height="200" rx="48" fill="#0B1224" />
+  <g filter="url(#glow)">
+    <circle cx="100" cy="100" r="70" fill="none" stroke="url(#logo-grad)" stroke-width="14" opacity="0.22" />
+    <path d="M75 56 L75 144 M75 100 L125 100" stroke="url(#logo-grad)" stroke-width="14" stroke-linecap="round" />
+    <path d="M125 76 L125 124" stroke="#E8D5B5" stroke-width="14" stroke-linecap="round" />
+    <circle cx="75" cy="100" r="8" fill="#E8D5B5" />
   </g>
 </svg>

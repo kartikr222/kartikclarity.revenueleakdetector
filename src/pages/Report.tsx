@@ -75,7 +75,7 @@ export default function Report() {
             <Button
               size="lg"
               className="bg-cream text-navy hover:bg-cream/90 text-lg px-8 py-6"
-              onClick={() => window.open('https://calendly.com/your-link', '_blank')}
+              onClick={() => window.open('https://calendly.com/kartikmraviraj/30min', '_blank')}
             >
               <Calendar className="mr-2 w-5 h-5" />
               Book Free Strategy Call
