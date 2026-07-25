@@ -5,7 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { submitDiagnosis, isSupabaseConfigured } from '@/lib/api'
+import { submitDiagnosis } from '@/lib/api'
+import { isSupabaseConfigured } from '@/lib/supabase'
 import { useDiagnosis } from '@/context/DiagnosisContext'
 import { DiagnosisInput } from '@/types'
 import { Loader2 } from 'lucide-react'
@@ -44,13 +45,6 @@ export default function Diagnose() {
       setLoading(false)
       return
     }
-
-    try {
-      if (!isSupabaseConfigured) {
-        setError('Diagnostic service is not configured. Please update the deployment environment.')
-        return
-      }
-
       const response = await submitDiagnosis(formData)
       if (response.success && response.data) {
         setResult(response.data)
@@ -229,7 +223,7 @@ export default function Diagnose() {
                 </Select>
               </div>
 
-              {!isSupabaseConfigured && (
+              )}
                 <div className="mb-6 rounded-2xl border border-yellow-300/40 bg-yellow-300/10 p-4 text-yellow-100">
                   <p className="font-semibold">Diagnostic service is temporarily unavailable.</p>
                   <p className="text-sm text-yellow-100/80">
@@ -247,7 +241,7 @@ export default function Diagnose() {
 
               <Button
                 type="submit"
-                disabled={loading || !isSupabaseConfigured}
+                disabled={loading}
                 className="w-full bg-cream text-navy hover:bg-cream/90 text-lg py-6 font-semibold"
               >
                 {loading ? (
