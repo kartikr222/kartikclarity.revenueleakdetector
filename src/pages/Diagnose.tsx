@@ -1,23 +1,47 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+
 import { submitDiagnosis } from '@/lib/api'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { useDiagnosis } from '@/context/DiagnosisContext'
 import { DiagnosisInput } from '@/types'
 import { Loader2 } from 'lucide-react'
 
-const industries = ['SaaS', 'E-commerce', 'Professional Services', 'Healthcare', 'Fintech', 'Manufacturing', 'Other']
+const industries = [
+  'SaaS',
+  'E-commerce',
+  'Professional Services',
+  'Healthcare',
+  'Fintech',
+  'Manufacturing',
+  'Other',
+]
 
 export default function Diagnose() {
   const navigate = useNavigate()
   const { setResult, setInput } = useDiagnosis()
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
   const [formData, setFormData] = useState<DiagnosisInput>({
     email: '',
     annualRevenue: 0,
@@ -30,8 +54,21 @@ export default function Diagnose() {
     industry: '',
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleNumberChange = (
+    field: keyof DiagnosisInput,
+    value: string
+  ) => {
+    setFormData({
+      ...formData,
+      [field]: parseFloat(value) || 0,
+    })
+  }
+
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault()
+
     setLoading(true)
     setError(null)
 
@@ -40,201 +77,275 @@ export default function Diagnose() {
       setLoading(false)
       return
     }
+
     if (formData.annualRevenue <= 0) {
       setError('Annual revenue must be greater than 0')
       setLoading(false)
       return
     }
+
+    try {
       const response = await submitDiagnosis(formData)
+
       if (response.success && response.data) {
         setResult(response.data)
         setInput(formData)
         navigate('/report')
       } else {
-        setError(response.error || 'Failed to process diagnosis')
+        setError(
+          response.error ||
+            'Failed to process diagnosis'
+        )
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
       console.error(err)
+      setError(
+        'An unexpected error occurred. Please try again.'
+      )
     } finally {
       setLoading(false)
     }
   }
 
-  const handleNumberChange = (field: keyof DiagnosisInput, value: string) => {
-    const numValue = parseFloat(value) || 0
-    setFormData({ ...formData, [field]: numValue })
-  }
-
   return (
     <div className="min-h-screen py-16">
-      <div className="container mx-auto px-4 max-w-3xl">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-cream mb-4">Revenue Leak Diagnosis</h1>
-          <p className="text-cream/70 text-lg">Answer 8 quick questions to reveal your hidden revenue leaks</p>
+      <div className="container mx-auto max-w-3xl px-4">
+        <div className="mb-12 text-center">
+          <h1 className="mb-4 text-3xl font-bold text-cream sm:text-4xl lg:text-5xl">
+            Revenue Leak Diagnosis
+          </h1>
+
+          <p className="text-lg text-cream/70">
+            Answer 8 quick questions to reveal
+            your hidden revenue leaks.
+          </p>
         </div>
 
-        <Card className="bg-navy/40 border-cream/20 shadow-2xl">
+        <Card className="border-cream/20 bg-navy/40 shadow-2xl">
           <CardHeader>
-            <CardTitle className="text-cream text-2xl">Business Metrics</CardTitle>
+            <CardTitle className="text-2xl text-cream">
+              Business Metrics
+            </CardTitle>
+
             <CardDescription className="text-cream/60">
-              All information is confidential and used only for your diagnosis
+              All information is confidential
+              and used only for your diagnosis.
             </CardDescription>
           </CardHeader>
+
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form
+              onSubmit={handleSubmit}
+              className="space-y-6"
+            >
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-cream">Email (optional)</Label>
+                <Label htmlFor="email" className="text-cream">
+                  Email (optional)
+                </Label>
+
                 <Input
                   id="email"
                   type="email"
                   placeholder="your@email.com"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      email: e.target.value,
+                    })
+                  }
                   className="bg-navy/60 border-cream/30 text-cream placeholder:text-cream/40"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="annualRevenue" className="text-cream">
-                  Annual Revenue ($) <span className="text-red-400">*</span>
+                  Annual Revenue ($)
                 </Label>
+
                 <Input
                   id="annualRevenue"
                   type="number"
                   required
-                  placeholder="1000000"
                   value={formData.annualRevenue || ''}
-                  onChange={(e) => handleNumberChange('annualRevenue', e.target.value)}
-                  className="bg-navy/60 border-cream/30 text-cream placeholder:text-cream/40"
+                  onChange={(e) =>
+                    handleNumberChange(
+                      'annualRevenue',
+                      e.target.value
+                    )
+                  }
+                  className="bg-navy/60 border-cream/30 text-cream"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="monthlyExpenses" className="text-cream">
-                  Monthly Expenses ($) <span className="text-red-400">*</span>
+                  Monthly Expenses ($)
                 </Label>
+
                 <Input
                   id="monthlyExpenses"
                   type="number"
                   required
-                  placeholder="50000"
                   value={formData.monthlyExpenses || ''}
-                  onChange={(e) => handleNumberChange('monthlyExpenses', e.target.value)}
-                  className="bg-navy/60 border-cream/30 text-cream placeholder:text-cream/40"
+                  onChange={(e) =>
+                    handleNumberChange(
+                      'monthlyExpenses',
+                      e.target.value
+                    )
+                  }
+                  className="bg-navy/60 border-cream/30 text-cream"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="cac" className="text-cream">
-                  Customer Acquisition Cost - CAC ($) <span className="text-red-400">*</span>
+                  Customer Acquisition Cost (CAC)
                 </Label>
+
                 <Input
                   id="cac"
                   type="number"
                   required
-                  placeholder="500"
                   value={formData.cac || ''}
-                  onChange={(e) => handleNumberChange('cac', e.target.value)}
-                  className="bg-navy/60 border-cream/30 text-cream placeholder:text-cream/40"
+                  onChange={(e) =>
+                    handleNumberChange(
+                      'cac',
+                      e.target.value
+                    )
+                  }
+                  className="bg-navy/60 border-cream/30 text-cream"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="ltv" className="text-cream">
-                  Customer Lifetime Value - LTV ($) <span className="text-red-400">*</span>
+                  Customer Lifetime Value (LTV)
                 </Label>
+
                 <Input
                   id="ltv"
                   type="number"
                   required
-                  placeholder="2000"
                   value={formData.ltv || ''}
-                  onChange={(e) => handleNumberChange('ltv', e.target.value)}
-                  className="bg-navy/60 border-cream/30 text-cream placeholder:text-cream/40"
+                  onChange={(e) =>
+                    handleNumberChange(
+                      'ltv',
+                      e.target.value
+                    )
+                  }
+                  className="bg-navy/60 border-cream/30 text-cream"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="churnRate" className="text-cream">
-                  Monthly Churn Rate (%) <span className="text-red-400">*</span>
+                  Monthly Churn Rate (%)
                 </Label>
+
                 <Input
                   id="churnRate"
                   type="number"
                   step="0.1"
                   required
-                  placeholder="5.5"
                   value={formData.churnRate || ''}
-                  onChange={(e) => handleNumberChange('churnRate', e.target.value)}
-                  className="bg-navy/60 border-cream/30 text-cream placeholder:text-cream/40"
+                  onChange={(e) =>
+                    handleNumberChange(
+                      'churnRate',
+                      e.target.value
+                    )
+                  }
+                  className="bg-navy/60 border-cream/30 text-cream"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="averageDealSize" className="text-cream">
-                  Average Deal Size ($) <span className="text-red-400">*</span>
+                  Average Deal Size ($)
                 </Label>
+
                 <Input
                   id="averageDealSize"
                   type="number"
                   required
-                  placeholder="1500"
                   value={formData.averageDealSize || ''}
-                  onChange={(e) => handleNumberChange('averageDealSize', e.target.value)}
-                  className="bg-navy/60 border-cream/30 text-cream placeholder:text-cream/40"
+                  onChange={(e) =>
+                    handleNumberChange(
+                      'averageDealSize',
+                      e.target.value
+                    )
+                  }
+                  className="bg-navy/60 border-cream/30 text-cream"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="salesCycleLength" className="text-cream">
-                  Sales Cycle Length (days) <span className="text-red-400">*</span>
+                  Sales Cycle Length (days)
                 </Label>
+
                 <Input
                   id="salesCycleLength"
                   type="number"
                   required
-                  placeholder="30"
                   value={formData.salesCycleLength || ''}
-                  onChange={(e) => handleNumberChange('salesCycleLength', e.target.value)}
-                  className="bg-navy/60 border-cream/30 text-cream placeholder:text-cream/40"
+                  onChange={(e) =>
+                    handleNumberChange(
+                      'salesCycleLength',
+                      e.target.value
+                    )
+                  }
+                  className="bg-navy/60 border-cream/30 text-cream"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="industry" className="text-cream">
-                  Industry <span className="text-red-400">*</span>
+                  Industry
                 </Label>
+
                 <Select
                   value={formData.industry}
-                  onValueChange={(value) => setFormData({ ...formData, industry: value })}
-                  required
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      industry: value,
+                    })
+                  }
                 >
-                  <SelectTrigger id="industry" className="bg-navy/60 border-cream/30 text-cream">
-                    <SelectValue placeholder="Select your industry" />
+                  <SelectTrigger className="bg-navy/60 border-cream/30 text-cream">
+                    <SelectValue placeholder="Select Industry" />
                   </SelectTrigger>
+
                   <SelectContent className="bg-navy border-cream/30">
                     {industries.map((industry) => (
-                      <SelectItem key={industry} value={industry} className="text-cream focus:bg-cream/10 focus:text-cream">
+                      <SelectItem
+                        key={industry}
+                        value={industry}
+                      >
                         {industry}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+              {!isSupabaseConfigured && (
+                <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-4 text-yellow-100">
+                  <p className="font-semibold">
+                    Supabase is not configured.
+                  </p>
 
-              )}
-                <div className="mb-6 rounded-2xl border border-yellow-300/40 bg-yellow-300/10 p-4 text-yellow-100">
-                  <p className="font-semibold">Diagnostic service is temporarily unavailable.</p>
-                  <p className="text-sm text-yellow-100/80">
-                    The deployment is missing Supabase configuration. Please set <code>VITE_SUPABASE_URL</code> and{' '}
-                    <code>VITE_SUPABASE_ANON_KEY</code> in production, then reload the page.
+                  <p className="mt-1 text-sm">
+                    Please configure
+                    VITE_SUPABASE_URL and
+                    VITE_SUPABASE_ANON_KEY
+                    in your Vercel Environment Variables.
                   </p>
                 </div>
               )}
 
               {error && (
-                <div className="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg text-sm">
+                <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-400">
                   {error}
                 </div>
               )}
@@ -242,12 +353,12 @@ export default function Diagnose() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-cream text-navy hover:bg-cream/90 text-lg py-6 font-semibold"
+                className="w-full bg-cream py-6 text-lg font-semibold text-navy hover:bg-cream/90"
               >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Analyzing Your Business...
+                    Analyzing...
                   </>
                 ) : (
                   'Generate My Revenue Leak Report'
