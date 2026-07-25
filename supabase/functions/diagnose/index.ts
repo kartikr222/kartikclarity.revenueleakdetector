@@ -2,7 +2,14 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 import { z } from 'https://esm.sh/zod@3.22.4'
 
+<<<<<<< HEAD
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
+=======
+// For production, set `GEMINI_API_KEY` as a Supabase secret. During local
+// development you can set the env var or use a local `.env` file. Do NOT
+// commit real keys to the repository.
+const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '<GEMINI_API_KEY_HERE>'
+>>>>>>> d46c202 (Remove hardcoded secrets from code; use placeholders)
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
