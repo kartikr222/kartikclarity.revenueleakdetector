@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/card'
 
 import { submitDiagnosis } from '@/lib/api'
-import { isSupabaseConfigured } from '@/lib/supabase'
 import { useDiagnosis } from '@/context/DiagnosisContext'
 import { DiagnosisInput } from '@/types'
 import { Loader2 } from 'lucide-react'
@@ -329,21 +328,6 @@ export default function Diagnose() {
                   </SelectContent>
                 </Select>
               </div>
-              {!isSupabaseConfigured && (
-                <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 p-4 text-yellow-100">
-                  <p className="font-semibold">
-                    Supabase is not configured.
-                  </p>
-
-                  <p className="mt-1 text-sm">
-                    Please configure
-                    VITE_SUPABASE_URL and
-                    VITE_SUPABASE_ANON_KEY
-                    in your Vercel Environment Variables.
-                  </p>
-                </div>
-              )}
-
               {error && (
                 <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-red-400">
                   {error}

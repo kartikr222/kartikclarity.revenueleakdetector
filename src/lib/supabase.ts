@@ -1,15 +1,17 @@
 import { createClient } from '@supabase/supabase-js'
 
+const defaultSupabaseUrl = 'https://ptktvwvgxbitpackbfwo.supabase.co'
+const defaultSupabaseAnonKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0a3R2d3ZneGJpdHBhY2tiZndvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5MTE3MjUsImV4cCI6MjEwMDQ4NzcyNX0.NCnrxp9Dxrm1f8xfpjaKCu4IlvuyWviBS9eTwN32CPI'
+
 const supabaseUrl =
-  import.meta.env.VITE_SUPABASE_URL ??
-  'https://ptktvwvgxbitpackbfwo.supabase.co'
+  import.meta.env.VITE_SUPABASE_URL?.trim() || defaultSupabaseUrl
 
 const supabaseAnonKey =
-  import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
+  import.meta.env.VITE_SUPABASE_ANON_KEY?.trim() || defaultSupabaseAnonKey
 
 export const isSupabaseConfigured =
-  supabaseUrl.trim().length > 0 &&
-  supabaseAnonKey.trim().length > 0
+  supabaseUrl.length > 0 && supabaseAnonKey.length > 0
 
 export const supabaseConfigError = isSupabaseConfigured
   ? undefined
