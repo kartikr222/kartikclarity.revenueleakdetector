@@ -84,11 +84,12 @@ export default function Diagnose() {
     try {
       const response = await submitDiagnosis(formData)
 
-      // The API is fail-open, but keep this final client-side guard so the
-      // Generate CTA can never strand the visitor on a service-error state.
-      const result = response.success && response.data
-        ? response.data
-        : generateMockDiagnosis(formData)
+      // Start with a guaranteed local result. The remote service can enrich it,
+      // but it can never block the report flow.
+      let result = generateMockDiagnosis(formData)
+      if (response.success && response.data) {
+        result = response.data
+      }
 
       setResult(result)
       setInput(formData)
