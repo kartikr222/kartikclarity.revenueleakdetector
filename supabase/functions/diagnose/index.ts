@@ -2,23 +2,16 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 import { z } from 'https://esm.sh/zod@3.22.4'
 
-<<<<<<< HEAD
+// Keep secrets in Supabase Edge Function environment variables.
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-=======
-// For production, set `GEMINI_API_KEY` as a Supabase secret. During local
-// development you can set the env var or use a local `.env` file. Do NOT
-// commit real keys to the repository.
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '<GEMINI_API_KEY_HERE>'
->>>>>>> d46c202 (Remove hardcoded secrets from code; use placeholders)
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
-
-// ---- Validation ----------------------------------------------------------
 
 const DiagnosisInputSchema = z.object({
   email: z.string().email().optional().or(z.literal('')),
@@ -49,11 +42,9 @@ const GeminiResponseSchema = z.object({
 
 type GeminiResponse = z.infer<typeof GeminiResponseSchema>
 
-// ---- Handler ---------------------------------------------------------------
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return new Response(null, { status: 204, headers: corsHeaders })
   }
 
   try {
@@ -73,7 +64,7 @@ serve(async (req) => {
     try {
       diagnosis = await callGeminiAPI(input)
     } catch (err) {
-      console.error('Gemini call failed, using fallback:', err)
+      console.error('Gemini call failed, using deterministic fallback:', err)
       diagnosis = generateMockDiagnosis(input)
     }
 
@@ -99,15 +90,13 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
-    console.error('Unhandled error:', error)
+    console.error('Unhandled diagnosis error:', error)
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
-
-// ---- Gemini ----------------------------------------------------------------
 
 async function callGeminiAPI(input: DiagnosisInput): Promise<GeminiResponse> {
   if (!GEMINI_API_KEY) {
@@ -149,8 +138,7 @@ Respond with ONLY valid JSON in this exact shape, no markdown fences, no extra t
   ]
 }
 
-Score using LTV:CAC ratio (ideal 3:1+), churn rate (>5% monthly is concerning), sales efficiency, and expense management relative to industry norms.
-Identify 3 to 5 leak categories such as high churn, poor LTV:CAC ratio, inefficient sales cycle, expense bloat, pricing gaps, or acquisition inefficiency, with dollar-specific impact_usd values grounded in the metrics above.`
+Score using LTV:CAC ratio (ideal 3:1+), churn rate (>5% monthly is concerning), sales efficiency, and expense management relative to industry norms. Identify 3 to 5 leak categories such as high churn, poor LTV:CAC ratio, inefficient sales cycle, expense bloat, pricing gaps, or acquisition inefficiency, with dollar-specific impact_usd values grounded in the metrics above.`
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -184,20 +172,14 @@ Identify 3 to 5 leak categories such as high churn, poor LTV:CAC ratio, ineffici
 
   let jsonText = textResponse.trim()
   if (jsonText.startsWith('```json')) {
-    jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '')
+    jsonText = jsonText.replace(/^```json\s*/, '').replace(/\s*```$/, '')
   } else if (jsonText.startsWith('```')) {
-    jsonText = jsonText.replace(/```\n?/g, '')
+    jsonText = jsonText.replace(/^```\s*/, '').replace(/\s*```$/, '')
   }
 
-  let candidate: unknown
-  try {
-    candidate = JSON.parse(jsonText)
-  } catch (parseErr) {
-    console.error('Failed to parse Gemini JSON:', jsonText)
-    throw parseErr
-  }
-
+  const candidate: unknown = JSON.parse(jsonText)
   const validated = GeminiResponseSchema.safeParse(candidate)
+
   if (!validated.success) {
     console.error('Gemini response failed schema validation:', validated.error.flatten())
     throw new Error('Malformed Gemini response')
@@ -205,10 +187,6 @@ Identify 3 to 5 leak categories such as high churn, poor LTV:CAC ratio, ineffici
 
   return validated.data
 }
-
-// ---- Deterministic fallback --------------------------------------------
-// Used if the Gemini call fails or returns malformed JSON, so a demo
-// or live submission never breaks the user-facing flow.
 
 function generateMockDiagnosis(input: DiagnosisInput): GeminiResponse {
   const ltvCacRatio = input.ltv / input.cac
