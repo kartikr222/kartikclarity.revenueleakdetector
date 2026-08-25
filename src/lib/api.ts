@@ -143,23 +143,22 @@ export async function submitDiagnosis(
   }
 
   try {
-    const controller = new AbortController()
-    const timeout = window.setTimeout(() => controller.abort(), 8000)
+    const remoteRequest = supabase.functions.invoke('diagnose', {
+      body: input,
+    })
 
-    try {
-      const { data, error } = await supabase.functions.invoke('diagnose', {
-        body: input,
-      })
+    const timeout = new Promise<never>((_, reject) => {
+      window.setTimeout(() => reject(new Error('Diagnosis request timed out')), 8000)
+    })
 
-      if (error || !isValidDiagnosisResult(data)) {
-        console.warn('Remote diagnosis unavailable or invalid; using local fallback.')
-        return fallback()
-      }
+    const { data, error } = await Promise.race([remoteRequest, timeout])
 
-      return success(data)
-    } finally {
-      window.clearTimeout(timeout)
+    if (error || !isValidDiagnosisResult(data)) {
+      console.warn('Remote diagnosis unavailable or invalid; using local fallback.')
+      return fallback()
     }
+
+    return success(data)
   } catch (error) {
     console.warn('Remote diagnosis failed; using local fallback.', error)
     return fallback()
