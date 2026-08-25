@@ -1,14 +1,12 @@
 import { supabase, isSupabaseConfigured } from './supabase'
-import { DiagnosisInput, DiagnosisResponse } from '@/types'
+import { DiagnosisInput, DiagnosisResponse, DiagnosisResult } from '@/types'
 
 /**
  * Deterministic client-side diagnosis used whenever the remote diagnosis
  * service is unavailable, returns an invalid payload, or throws.
  * The report flow must never strand a user on the diagnosis form.
  */
-export function generateMockDiagnosis(
-  input: DiagnosisInput
-): DiagnosisResponse['data'] {
+export function generateMockDiagnosis(input: DiagnosisInput): DiagnosisResult {
   const ltv = Number(input.ltv || 0)
   const cac = Number(input.cac || 0)
   const churn = Number(input.churnRate || 0)
@@ -57,7 +55,7 @@ export function generateMockDiagnosis(
   }
 }
 
-function success(data: DiagnosisResponse['data']): DiagnosisResponse {
+function success(data: DiagnosisResult): DiagnosisResponse {
   return { success: true, data }
 }
 
