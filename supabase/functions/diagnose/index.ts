@@ -2,14 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3'
 import { z } from 'https://esm.sh/zod@3.22.4'
 
-<<<<<<< HEAD
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY')
-=======
-// For production, set `GEMINI_API_KEY` as a Supabase secret. During local
-// development you can set the env var or use a local `.env` file. Do NOT
-// commit real keys to the repository.
-const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY') ?? '<GEMINI_API_KEY_HERE>'
->>>>>>> d46c202 (Remove hardcoded secrets from code; use placeholders)
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
@@ -69,13 +62,7 @@ serve(async (req) => {
 
     const input = parsedInput.data
 
-    let diagnosis: GeminiResponse
-    try {
-      diagnosis = await callGeminiAPI(input)
-    } catch (err) {
-      console.error('Gemini call failed, using fallback:', err)
-      diagnosis = generateMockDiagnosis(input)
-    }
+    const diagnosis = await callGeminiAPI(input)
 
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       try {
@@ -206,93 +193,3 @@ Identify 3 to 5 leak categories such as high churn, poor LTV:CAC ratio, ineffici
   return validated.data
 }
 
-// ---- Deterministic fallback --------------------------------------------
-// Used if the Gemini call fails or returns malformed JSON, so a demo
-// or live submission never breaks the user-facing flow.
-
-function generateMockDiagnosis(input: DiagnosisInput): GeminiResponse {
-  const ltvCacRatio = input.ltv / input.cac
-  const annualChurn = input.churnRate * 12
-  const annualBurn = input.monthlyExpenses * 12
-
-  let score = 70
-  if (ltvCacRatio < 3) score -= 15
-  if (ltvCacRatio < 1.5) score -= 15
-  if (input.churnRate > 5) score -= 15
-  if (input.salesCycleLength > 60) score -= 10
-  if (annualBurn > input.annualRevenue * 0.8) score -= 10
-  score = Math.max(10, Math.min(95, score))
-
-  const categories: GeminiResponse['categories'] = []
-
-  if (ltvCacRatio < 3) {
-    categories.push({
-      name: 'Weak LTV to CAC Ratio',
-      description: `Your LTV:CAC ratio is ${ltvCacRatio.toFixed(2)}:1, below the healthy 3:1 benchmark. You are spending too much to acquire customers relative to what they are worth over time.`,
-      impact_usd: Math.round(input.cac * (input.annualRevenue / Math.max(input.averageDealSize, 1)) * 0.15),
-      recommendations: [
-        'Tighten targeting to reduce wasted acquisition spend',
-        'Increase average deal size through bundling or upsells',
-        'Extend customer lifetime with a structured onboarding and retention program',
-      ],
-    })
-  }
-
-  if (input.churnRate > 3) {
-    categories.push({
-      name: 'Elevated Customer Churn',
-      description: `A ${input.churnRate}% monthly churn rate compounds to roughly ${annualChurn.toFixed(1)}% annually, steadily eroding recurring revenue you already paid to acquire.`,
-      impact_usd: Math.round(input.annualRevenue * (input.churnRate / 100) * 0.6),
-      recommendations: [
-        'Run exit interviews to identify the top 3 churn triggers',
-        'Build a proactive health-score alert for at-risk accounts',
-        'Introduce a save offer at the cancellation step',
-      ],
-    })
-  }
-
-  if (input.salesCycleLength > 45) {
-    categories.push({
-      name: 'Extended Sales Cycle',
-      description: `A ${input.salesCycleLength}-day sales cycle delays cash flow and ties up sales capacity that could be spent on new pipeline.`,
-      impact_usd: Math.round(input.averageDealSize * (input.salesCycleLength / 30) * 8),
-      recommendations: [
-        'Map the deal stages where prospects stall and remove friction there',
-        'Introduce mutual action plans with target close dates',
-        'Equip reps with ROI calculators to speed up economic buy-in',
-      ],
-    })
-  }
-
-  if (annualBurn > input.annualRevenue * 0.7) {
-    categories.push({
-      name: 'Expense to Revenue Imbalance',
-      description: `Annual expenses of $${annualBurn.toLocaleString()} consume a large share of your $${input.annualRevenue.toLocaleString()} revenue, leaving thin margin to reinvest in growth.`,
-      impact_usd: Math.round(annualBurn * 0.1),
-      recommendations: [
-        'Audit recurring software and vendor spend for consolidation',
-        'Tie discretionary spend to revenue milestones',
-        'Renegotiate top 3 vendor contracts annually',
-      ],
-    })
-  }
-
-  if (categories.length === 0) {
-    categories.push({
-      name: 'Renewal and Expansion Gap',
-      description: `Your core metrics are healthy for ${input.industry}. The next leak to close is usually under-monetized expansion revenue from existing accounts.`,
-      impact_usd: Math.round(input.annualRevenue * 0.05),
-      recommendations: [
-        'Build a structured quarterly business review for top accounts',
-        'Introduce usage-based upsell triggers',
-        'Formalize a referral program for your happiest customers',
-      ],
-    })
-  }
-
-  return {
-    score,
-    summary: `Your ${input.industry} business scores ${score}/100 on revenue health. The largest opportunities are concentrated in ${categories.length} area${categories.length > 1 ? 's' : ''}, representing recoverable revenue if addressed in the next two quarters.`,
-    categories,
-  }
-}

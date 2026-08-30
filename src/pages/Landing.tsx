@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, BarChart3, TrendingUp, DollarSign, Shield } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 const calendlyUrl = 'https://calendly.com/kartikmraviraj/30min'
 
@@ -65,51 +65,123 @@ export default function Landing() {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {[
-            {
-              icon: BarChart3,
-              title: 'Comprehensive Analysis',
-              description: 'Deep dive into 8 critical business metrics to uncover inefficiencies',
-            },
-            {
-              icon: TrendingUp,
-              title: 'AI-Powered Insights',
-              description: 'Gemini 2.0 analyzes patterns invisible to traditional audits',
-            },
-            {
-              icon: DollarSign,
-              title: 'Quantified Impact',
-              description: 'See exactly how much each leak costs you annually in dollars',
-            },
-            {
-              icon: Shield,
-              title: 'Actionable Roadmap',
-              description: 'Get specific, prioritized recommendations you can implement today',
-            },
-          ].map((feature, idx) => (
-            <div
-              key={idx}
-              className="bg-navy/40 border border-cream/20 rounded-3xl p-6 hover:border-cream/40 transition-all duration-300 hover:shadow-[0_24px_60px_rgba(0,0,0,0.22)] h-full"
-            >
-              <feature.icon className="w-10 h-10 text-cream mb-4" />
-              <h3 className="text-cream font-semibold text-lg mb-2">{feature.title}</h3>
-              <p className="text-cream/70 text-sm leading-relaxed">{feature.description}</p>
+      <section className="container mx-auto px-4 py-20">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold text-cream mb-4">What You Get</h2>
+            <p className="max-w-3xl mx-auto text-cream/75 text-lg leading-relaxed">
+              Everything you need to diagnose revenue leaks, prioritize the highest-impact fixes, and execute with a clear implementation roadmap.
+            </p>
+          </div>
+
+          <div className="grid gap-8 lg:grid-cols-2 xl:grid-cols-5">
+            <div className="rounded-[2rem] border border-cream/15 bg-navy/40 p-6 shadow-[0_24px_55px_rgba(0,0,0,0.18)] xl:col-span-1">
+              <h3 className="text-xl font-semibold text-cream mb-4">Platform Access</h3>
+              <ul className="space-y-2 text-cream/75 text-sm leading-relaxed">
+                <li>• Revenue Intelligence OS™ platform access</li>
+                <li>• Executive client dashboard</li>
+                <li>• Dedicated private workspace</li>
+                <li>• Guided onboarding portal</li>
+                <li>• Priority support and private community</li>
+              </ul>
             </div>
-          ))}
+
+            <div className="rounded-[2rem] border border-cream/15 bg-navy/40 p-6 shadow-[0_24px_55px_rgba(0,0,0,0.18)] xl:col-span-1">
+              <h3 className="text-xl font-semibold text-cream mb-4">Executive Frameworks</h3>
+              <ul className="space-y-2 text-cream/75 text-sm leading-relaxed">
+                <li>• Revenue Leak Assessment™</li>
+                <li>• Executive diagnostic reports</li>
+                <li>• Revenue scorecards and health checks</li>
+                <li>• 30 / 60 / 90-day execution roadmaps</li>
+                <li>• Executive implementation templates</li>
+                <li>• Data collection and analysis frameworks</li>
+                <li>• Notion operating workspace</li>
+              </ul>
+            </div>
+
+            <div className="rounded-[2rem] border border-cream/15 bg-navy/40 p-6 shadow-[0_24px_55px_rgba(0,0,0,0.18)] xl:col-span-1">
+              <h3 className="text-xl font-semibold text-cream mb-4">Templates, Playbooks &amp; Assets</h3>
+              <ul className="space-y-2 text-cream/75 text-sm leading-relaxed">
+                <li>• Sales and follow-up templates</li>
+                <li>• Handoff and onboarding playbooks</li>
+                <li>• Proposal and implementation templates</li>
+                <li>• Executive presentation templates</li>
+                <li>• Decision-making frameworks</li>
+                <li>• Continuously updated operating resources</li>
+              </ul>
+            </div>
+
+            <div className="rounded-[2rem] border border-cream/15 bg-navy/40 p-6 shadow-[0_24px_55px_rgba(0,0,0,0.18)] xl:col-span-1">
+              <h3 className="text-xl font-semibold text-cream mb-4">Integrations &amp; Delivery</h3>
+              <ul className="space-y-2 text-cream/75 text-sm leading-relaxed">
+                <li>• GitHub access (where applicable)</li>
+                <li>• Discord / Telegram access (where applicable)</li>
+                <li>• Connected business tools and systems</li>
+                <li>• Client-specific workspace permissions</li>
+                <li>• Custom implementation configuration during onboarding</li>
+              </ul>
+            </div>
+
+            <div className="rounded-[2rem] border border-cream/15 bg-navy/40 p-6 shadow-[0_24px_55px_rgba(0,0,0,0.18)] xl:col-span-1">
+              <h3 className="text-xl font-semibold text-cream mb-4">Licensing</h3>
+              <ul className="space-y-2 text-cream/75 text-sm leading-relaxed">
+                <li>• Revenue Intelligence OS™ license</li>
+                <li>• AI-assisted diagnostic capabilities</li>
+                <li>• Client-specific feature configuration</li>
+                <li>• Usage limits based on your plan</li>
+                <li>• Ongoing platform improvements</li>
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
       <section className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="bg-navy/40 border border-cream/20 rounded-[2rem] p-8 sm:p-12 shadow-[0_24px_55px_rgba(0,0,0,0.2)]">
-            <p className="text-cream/80 text-lg italic mb-4 leading-relaxed">
-              Most businesses are losing 15 to 30 percent of potential revenue to preventable leaks.
-              The ones who find and fix them first win the market.
+        <div className="max-w-5xl mx-auto rounded-[2rem] border border-cream/15 bg-navy/70 p-8 sm:p-12 shadow-[0_35px_80px_rgba(0,0,0,0.25)]">
+          <div className="mb-6">
+            <p className="text-cream/80 text-sm uppercase tracking-[0.22em] mb-3">Enterprise Delivery</p>
+            <p className="text-cream/75 text-lg leading-relaxed">
+              Immediately after purchase, you’ll receive secure access to the platform and all included digital assets.
             </p>
-            <p className="text-cream font-semibold">— Kartik Clarity™ Research Team</p>
           </div>
+
+          <p className="text-cream/75 text-lg leading-relaxed mb-6">
+            Your client-specific workspace, integrations, configurations, connected systems, and implementation deliverables are provisioned during onboarding based on your engagement.
+          </p>
+
+          <p className="text-2xl sm:text-3xl font-semibold text-cream leading-relaxed tracking-tight">
+            <strong>One platform. One diagnosis. One execution system.</strong>
+          </p>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-20">
+        <div className="max-w-5xl mx-auto rounded-[2rem] border border-cream/15 bg-navy/70 p-8 sm:p-12 shadow-[0_35px_80px_rgba(0,0,0,0.25)]">
+          <h2 className="text-3xl sm:text-4xl font-bold text-cream mb-6">Revenue Intelligence OS™</h2>
+
+          <h3 className="text-2xl sm:text-3xl font-semibold text-cream mb-5 leading-tight">
+            Diagnose the constraint before you invest another dollar trying to fix it.
+          </h3>
+
+          <p className="text-cream/75 text-lg leading-relaxed mb-5">
+            Revenue Intelligence OS™ is an executive revenue diagnosis platform for B2B SaaS companies generating <strong>$5M–$50M ARR</strong>.
+          </p>
+
+          <p className="text-cream/75 text-lg leading-relaxed mb-5">
+            It helps founders, CEOs, CROs, and revenue leaders identify exactly where revenue is being lost across the entire commercial engine—from demand generation and pipeline to sales, onboarding, expansion, and retention.
+          </p>
+
+          <p className="text-cream/75 text-lg leading-relaxed mb-6">
+            Instead of relying on assumptions, disconnected dashboards, or more software, the platform gives leadership teams a complete revenue diagnosis powered by proprietary frameworks, executive scorecards, AI-assisted analysis, implementation playbooks, and actionable roadmaps.
+          </p>
+
+          <p className="text-2xl font-semibold text-cream mb-4 leading-relaxed">
+            <strong>Know what’s leaking. Know what to fix first. Execute with confidence.</strong>
+          </p>
+
+          <blockquote className="border-l-2 border-cream/30 pl-4 text-xl text-cream/90 italic leading-relaxed">
+            Diagnose the constraint. Prioritize the leak. Execute with clarity.
+          </blockquote>
         </div>
       </section>
 

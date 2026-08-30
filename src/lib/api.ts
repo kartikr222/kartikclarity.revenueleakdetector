@@ -92,110 +92,86 @@ function generateMockDiagnosis(
 export async function submitDiagnosis(
   input: DiagnosisInput
 ): Promise<DiagnosisResponse> {
-
+  const allowMockFallback = import.meta.env.DEV
 
   try {
-
-
     if (!isSupabaseConfigured) {
-
-      console.warn(
-        'Supabase unavailable, using fallback diagnosis'
-      )
+      if (allowMockFallback) {
+        console.warn('Supabase unavailable, using fallback diagnosis in development mode')
+        return {
+          success: true,
+          data: generateMockDiagnosis(input),
+        }
+      }
 
       return {
-        success: true,
-        data: generateMockDiagnosis(input)
+        success: false,
+        error: 'Diagnosis service is unavailable right now. Please try again later.',
       }
     }
 
-
-
-    const {
-      data,
-      error
-
-    } = await supabase.functions.invoke(
-      'diagnose',
-      {
-        body: input
+    if (!supabase) {
+      return {
+        success: false,
+        error: 'Diagnosis service is unavailable right now. Please try again later.',
       }
-    )
+    }
 
-
+    const { data, error } = await supabase.functions.invoke('diagnose', {
+      body: input,
+    })
 
     if (error) {
+      console.error('Supabase diagnose error:', error)
 
-      console.error(
-        'Supabase diagnose error:',
-        error
-      )
-
+      if (allowMockFallback) {
+        return {
+          success: true,
+          data: generateMockDiagnosis(input),
+        }
+      }
 
       return {
-        success: true,
-        data: generateMockDiagnosis(input)
+        success: false,
+        error: 'Diagnosis service could not generate your report. Please try again later.',
       }
     }
 
-
-
-
-    if (
-      !data ||
-      typeof data.score !== 'number'
-    ) {
-
-
-      return {
-        success: true,
-        data: generateMockDiagnosis(input)
+    if (!data || typeof data.score !== 'number') {
+      if (allowMockFallback) {
+        return {
+          success: true,
+          data: generateMockDiagnosis(input),
+        }
       }
 
+      return {
+        success: false,
+        error: 'Diagnosis service returned an invalid response. Please try again later.',
+      }
     }
-
-
 
     return {
-
       success: true,
-
       data: {
-
         score: data.score,
-
-        categories:
-          data.categories || [],
-
-        summary:
-          data.summary ||
-          'Diagnosis completed successfully.'
-
-      }
-
+        categories: data.categories || [],
+        summary: data.summary || 'Diagnosis completed successfully.',
+      },
     }
-
-
-
   } catch (error) {
+    console.error('Diagnosis API failure:', error)
 
-
-    console.error(
-      'Diagnosis API failure:',
-      error
-    )
-
-
+    if (allowMockFallback) {
+      return {
+        success: true,
+        data: generateMockDiagnosis(input),
+      }
+    }
 
     return {
-
-      success: true,
-
-      data:
-        generateMockDiagnosis(input)
-
+      success: false,
+      error: 'An unexpected error occurred while generating your diagnosis. Please try again.',
     }
-
   }
-
 }
