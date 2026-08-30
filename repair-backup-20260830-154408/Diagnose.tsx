@@ -57,9 +57,10 @@ export default function Diagnose() {
     field: keyof DiagnosisInput,
     value: string
   ) => {
+    const parsed = value === '' ? 0 : Number(value)
     setFormData({
       ...formData,
-      [field]: parseFloat(value) || 0,
+      [field]: Number.isFinite(parsed) ? parsed : 0,
     })
   }
 
@@ -69,14 +70,9 @@ export default function Diagnose() {
     setLoading(true)
     setError(null)
 
-    if (!formData.industry) {
-      setError('Please select an industry')
-      setLoading(false)
-      return
-    }
-
-    if (formData.annualRevenue <= 0) {
-      setError('Annual revenue must be greater than 0')
+    const validationMessage = validateForm()
+    if (validationMessage) {
+      setError(validationMessage)
       setLoading(false)
       return
     }
@@ -273,3 +269,4 @@ export default function Diagnose() {
     </div>
   )
 }
+

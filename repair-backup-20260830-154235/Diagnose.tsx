@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button } from '@/components/ui/button'
@@ -57,26 +57,60 @@ export default function Diagnose() {
     field: keyof DiagnosisInput,
     value: string
   ) => {
+    const parsed = value === '' ? 0 : Number(value)
     setFormData({
       ...formData,
-      [field]: parseFloat(value) || 0,
+      [field]: Number.isFinite(parsed) ? parsed : 0,
     })
   }
 
+<<<<<<< HEAD
+  const validateForm = () => {
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      return 'Please enter a valid email address.'
+    }
+
+    if (!formData.industry) {
+      return 'Please select an industry.'
+    }
+
+    const checks: Array<[string, number]> = [
+      ['Annual revenue', formData.annualRevenue],
+      ['Monthly expenses', formData.monthlyExpenses],
+      ['Customer acquisition cost', formData.cac],
+      ['Customer lifetime value', formData.ltv],
+      ['Churn rate', formData.churnRate],
+      ['Average deal size', formData.averageDealSize],
+      ['Sales cycle length', formData.salesCycleLength],
+    ]
+
+    for (const [label, value] of checks) {
+      if (!Number.isFinite(value) || value <= 0) {
+        return `${label} must be greater than 0.`
+      }
+    }
+
+    if (formData.churnRate > 100) {
+      return 'Monthly churn rate must be less than or equal to 100%.'
+    }
+
+    return null
+  }
+
+  const handleSubmit = async (
+    e: React.FormEvent
+  ) => {
+=======
   const handleSubmit = async (e: React.FormEvent) => {
+>>>>>>> 5f6088ee3b9c275fb85440a4dc0403c2b0fbed1f
     e.preventDefault()
 
     setLoading(true)
     setError(null)
 
-    if (!formData.industry) {
-      setError('Please select an industry')
-      setLoading(false)
-      return
-    }
-
-    if (formData.annualRevenue <= 0) {
-      setError('Annual revenue must be greater than 0')
+    const validationMessage = validateForm()
+    if (validationMessage) {
+      setError(validationMessage)
       setLoading(false)
       return
     }

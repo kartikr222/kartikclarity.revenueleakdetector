@@ -1,4 +1,4 @@
-﻿import { supabase, isSupabaseConfigured } from './supabase'
+import { supabase, isSupabaseConfigured } from './supabase'
 import { DiagnosisInput, DiagnosisResponse, DiagnosisResult } from '@/types'
 
 /**
@@ -135,6 +135,91 @@ function isValidDiagnosisResult(value: unknown): value is DiagnosisResult {
 export async function submitDiagnosis(
   input: DiagnosisInput
 ): Promise<DiagnosisResponse> {
+<<<<<<< HEAD
+  const allowMockFallback = import.meta.env.DEV
+
+  try {
+    if (!isSupabaseConfigured) {
+      if (allowMockFallback) {
+        console.warn('Supabase unavailable, using fallback diagnosis in development mode')
+        return {
+          success: true,
+          data: generateMockDiagnosis(input),
+        }
+      }
+
+      return {
+        success: false,
+        error: 'Diagnosis service is unavailable right now. Please try again later.',
+      }
+    }
+
+    if (!supabase) {
+      return {
+        success: false,
+        error: 'Diagnosis service is unavailable right now. Please try again later.',
+      }
+    }
+
+    const { data, error } = await supabase.functions.invoke('diagnose', {
+      body: input,
+    })
+
+    if (error) {
+      console.error('Supabase diagnose error:', error)
+
+      if (allowMockFallback) {
+        return {
+          success: true,
+          data: generateMockDiagnosis(input),
+        }
+      }
+
+      return {
+        success: false,
+        error: 'Diagnosis service could not generate your report. Please try again later.',
+      }
+    }
+
+    if (!data || typeof data.score !== 'number') {
+      if (allowMockFallback) {
+        return {
+          success: true,
+          data: generateMockDiagnosis(input),
+        }
+      }
+
+      return {
+        success: false,
+        error: 'Diagnosis service returned an invalid response. Please try again later.',
+      }
+    }
+
+    return {
+      success: true,
+      data: {
+        score: data.score,
+        categories: data.categories || [],
+        summary: data.summary || 'Diagnosis completed successfully.',
+      },
+    }
+  } catch (error) {
+    console.error('Diagnosis API failure:', error)
+
+    if (allowMockFallback) {
+      return {
+        success: true,
+        data: generateMockDiagnosis(input),
+      }
+    }
+
+    return {
+      success: false,
+      error: 'An unexpected error occurred while generating your diagnosis. Please try again.',
+    }
+  }
+}
+=======
   const fallback = () => success(generateMockDiagnosis(input))
 
   if (!isSupabaseConfigured) {
@@ -143,10 +228,6 @@ export async function submitDiagnosis(
   }
 
   try {
-    if (!supabase) {
-      throw new Error('Supabase is not configured.');
-    }
-
     const remoteRequest = supabase.functions.invoke('diagnose', {
       body: input,
     })
@@ -168,6 +249,4 @@ export async function submitDiagnosis(
     return fallback()
   }
 }
-
-
-
+>>>>>>> 5f6088ee3b9c275fb85440a4dc0403c2b0fbed1f

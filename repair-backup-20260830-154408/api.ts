@@ -143,10 +143,6 @@ export async function submitDiagnosis(
   }
 
   try {
-    if (!supabase) {
-      throw new Error('Supabase is not configured.');
-    }
-
     const remoteRequest = supabase.functions.invoke('diagnose', {
       body: input,
     })
@@ -168,6 +164,4 @@ export async function submitDiagnosis(
     return fallback()
   }
 }
-
-
 
